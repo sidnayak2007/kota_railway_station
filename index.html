@@ -47,14 +47,15 @@
           <div class="scene-tag"><span id="scene-id">ESCALATOR STR</span><span>3D INTERPRETATION</span></div>
           <div class="view-actions"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset" aria-label="Reset view" title="Reset view">↺</button></div>
           <div class="viewer-help"><span class="desktop-help">Drag to orbit · Scroll to zoom</span><span class="touch-help">Drag to rotate · Pinch to zoom</span></div>
-          <div id="fallback" hidden><div class="fallback-art" id="fallback-art"></div><h2>3D view unavailable in this browser</h2><p>This 2D structural preview and the measurements remain available. Use a browser with WebGL to rotate the model.</p></div>
+          <div id="fallback" hidden><div class="fallback-art" id="fallback-art"></div><div class="fallback-track" aria-hidden="true"><div class="fallback-rolling" id="fallback-rolling"><i></i><i></i><i></i><i></i></div></div><h2>3D view unavailable in this browser</h2><p>The structural preview and train mix remain available here. Use a browser with WebGL to rotate the detailed station model.</p></div>
         </div>
 
         <div class="train-bar">
           <div class="train-icon">VB</div>
-          <div class="train-copy"><strong>Vande Bharat</strong><span id="train-status" role="status">Entering the station</span></div>
+          <div class="train-copy"><strong id="train-name">Vande Bharat</strong><span id="train-kind">electric trainset</span><span id="train-status" role="status">Entering the station</span></div>
           <div class="train-progress"><div id="progress"></div></div>
-          <button id="run-train">Run now</button><button id="pause" aria-pressed="false">Pause</button>
+          <label class="train-picker">TRAIN MIX <select id="train-type" aria-label="Choose train type"><option value="auto">Auto · all 8</option><option value="vande">Vande Bharat</option><option value="rajdhani">Rajdhani Express</option><option value="shatabdi">Shatabdi Express</option><option value="duronto">Duronto Express</option><option value="tejas">Tejas Express</option><option value="mail">Mail / Express</option><option value="memu">MEMU</option><option value="freight">Freight train</option></select></label>
+          <button id="next-train">Next train</button><button id="run-train">Run now</button><button id="pause" aria-pressed="false">Pause</button>
         </div>
 
         <div class="scene-options">
@@ -77,6 +78,7 @@
     </div>
 
 
+    <section class="train-roster" aria-label="Indian Railways train mix"><div><p class="eyebrow">TRAINS ON THE LINE</p><h2>Eight kinds of rolling stock</h2><p>The viewer cycles through Vande Bharat, Rajdhani, Shatabdi, Duronto, Tejas, classic Mail / Express, MEMU and container freight. Choose one from the menu or leave it on Auto for a new type every 30 seconds.</p></div><div class="train-swatches"><span>Vande Bharat</span><span>Rajdhani</span><span>Shatabdi</span><span>Duronto</span><span>Tejas</span><span>Mail / Express</span><span>MEMU</span><span>Freight</span></div><small>Representative model types and liveries; this is not a Kota Junction timetable.</small></section>
     <section class="station-context" aria-label="Station research and placement">
       <div><p class="eyebrow">WHY THESE LOCATIONS</p><h2>From frontage to platform</h2></div>
       <div class="context-grid">
@@ -104,3 +106,4 @@
   <script type="module" src="app.js"></script>
 </body>
 </html>
+
