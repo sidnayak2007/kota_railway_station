@@ -22,6 +22,50 @@ function cylinder(g,x,y,z,r,h,m=M.steel,segments=10){const o=new T.Mesh(new T.Cy
 function beam(g,a,b,w=.12,d=.12,m=M.steel){const p=new T.Vector3(...a),v=new T.Vector3(...b).sub(p);const o=new T.Mesh(new T.BoxGeometry(w,v.length(),d),m);o.position.copy(p).addScaledVector(v,.5);o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v.normalize());o.castShadow=true;o.receiveShadow=true;g.add(o);return o;}
 function tube(g,curve,r=.07,m=M.steel){const o=new T.Mesh(new T.TubeGeometry(curve,48,r,8,false),m);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;}
 function bolt(g,x,y,z,r=.045){const o=cylinder(g,x,y,z,r,.06,M.steelDark,8);o.rotation.x=Math.PI/2;return o;}
+function platformSurface(g,width,depth,z,repeatY){
+  const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;
+  const ctx=canvas.getContext('2d');ctx.fillStyle='#c5c3b8';ctx.fillRect(0,0,256,256);
+  ctx.strokeStyle='#a7a99e';ctx.lineWidth=3;
+  for(let y=0;y<=256;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(256,y);ctx.stroke();}
+  for(let row=0;row<4;row++)for(let x=0;x<=256;x+=64){
+    const offset=row%2?32:0;ctx.beginPath();ctx.moveTo(x+offset,row*64);ctx.lineTo(x+offset,(row+1)*64);ctx.stroke();
+  }
+  const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
+  texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.set(55,repeatY);
+  const mesh=new T.Mesh(new T.PlaneGeometry(width,depth),new T.MeshStandardMaterial({map:texture,roughness:.95}));
+  mesh.rotation.x=-Math.PI/2;mesh.position.set(0,.562,z);mesh.receiveShadow=true;mesh.userData.disposeMaterial=true;g.add(mesh);
+}
+
+function concourseTiles(g){
+  const c=document.createElement('canvas');c.width=c.height=512;
+  const ctx=c.getContext('2d');
+  for(let row=0;row<8;row++)for(let col=0;col<8;col++){
+    ctx.fillStyle=(row+col)%2?'#c1beb6':'#e1ded4';
+    ctx.fillRect(col*64,row*64,64,64);
+    ctx.strokeStyle='#eee9df';ctx.lineWidth=2;ctx.strokeRect(col*64,row*64,64,64);
+  }
+  const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;
+  texture.wrapS=texture.wrapT=T.RepeatWrapping;texture.repeat.set(2,1.5);
+  const floor=new T.Mesh(new T.PlaneGeometry(20,14.5),new T.MeshStandardMaterial({map:texture,roughness:.42,metalness:.06}));
+  floor.rotation.x=-Math.PI/2;floor.position.set(0,.381,-21.3);
+  floor.receiveShadow=true;floor.userData.disposeMaterial=true;g.add(floor);
+}
+
+function curvedChannel(g,span,endY,crownY,z,web=.20){
+  const shape=new T.Shape();const n=48;
+  const point=t=>({x:-span/2+span*t,y:endY*(1-t)*(1-t)+2*crownY*t*(1-t)+endY*t*t});
+  for(let i=0;i<=n;i++){const p=point(i/n);i?shape.lineTo(p.x,p.y+web/2):shape.moveTo(p.x,p.y+web/2);}
+  for(let i=n;i>=0;i--){const p=point(i/n);shape.lineTo(p.x,p.y-web/2);}
+  shape.closePath();
+  const member=new T.Mesh(new T.ExtrudeGeometry(shape,{depth:.17,bevelEnabled:false,steps:1}),M.steelLight);
+  member.position.z=z-.085;member.castShadow=true;member.receiveShadow=true;g.add(member);
+  // Narrow channel flanges make the members read as rolled steel rather than round rails.
+  for(const faceZ of [z-.107,z+.107]){
+    const line=new T.QuadraticBezierCurve3(new T.Vector3(-span/2,endY+web/2,faceZ),new T.Vector3(0,crownY+web/2,faceZ),new T.Vector3(span/2,endY+web/2,faceZ));
+    tube(g,line,.018,M.steelDark);
+  }
+  return t=>point(t).y;
+}
 
 function labelTexture(text,accent=false){const c=document.createElement('canvas');c.width=1024;c.height=160;const x=c.getContext('2d');x.fillStyle='rgba(255,255,255,.97)';x.fillRect(5,5,1014,150);x.strokeStyle=accent?'#f47b38':'#2a6688';x.lineWidth=9;x.strokeRect(5,5,1014,150);x.fillStyle='#12344d';x.textAlign='center';x.textBaseline='middle';x.font='700 56px sans-serif';x.fillText(text,512,82,940);const tx=new T.CanvasTexture(c);tx.colorSpace=T.SRGBColorSpace;return tx;}
 function label(g,text,pos,scale=1.4,accent=false){const s=new T.Sprite(new T.SpriteMaterial({map:labelTexture(text,accent),depthTest:false,transparent:true}));s.position.set(...pos);s.scale.set(scale*5.8,scale,1);s.renderOrder=20;g.add(s);return s;}
@@ -34,23 +78,40 @@ function tree(g,x,z,s=1){const q=new T.Group();q.position.set(x,-.2,z);g.add(q);
 function stationBuilding(g){
   const rose=mat('#cf9e92',0,.94),sand=mat('#eed2b8',0,.94),trim=mat('#f3dfc4',0,.9),recess=mat('#414a49',0,.9);
   const frontage=-28.5;
-  box(g,0,3.65,-21.3,78,7.3,14.4,rose);
+  // Leave a real through-opening at the centre bay. A single solid station
+  // block here used to sit directly behind the curved steel frame.
+  for(const x of [-24.5,24.5])box(g,x,3.65,-21.3,29,7.3,14.4,rose);
+  // Only the façade plane encloses the neighbouring bays. The concourse behind
+  // the portal opens out to columns, as in the supplied structural visual.
+  for(const x of [-7.2,7.2])for(const z of [-27.85,-14.75])box(g,x,2.68,z,5.6,5.25,1.35,rose);
+  box(g,0,6.3,-21.3,20,2.0,14.4,rose);
+  box(g,0,.28,-21.3,20,.18,14.5,mat('#d7c8ad',0,.83));
+  concourseTiles(g);
+  for(const x of [-4.36,4.36]){
+    box(g,x,2.68,frontage+.55,.14,5.25,1.2,sand);
+    box(g,x,1.0,frontage+.55,.055,1.3,1.2,trim);
+  }
+  for(const x of [-8.4,8.4])for(const z of [-24,-19.2]){
+    box(g,x,2.72,z,.72,5.3,.72,mat('#bbb9b0',0,.92));
+    box(g,x,5.3,z,1.02,.25,1.02,sand);
+  }
+  box(g,0,5.28,-21.3,20,.12,14.4,trim);
+  for(const z of [-26,-22,-18]){
+    box(g,0,5.08,z,9.0,.055,.3,mat('#ffedcb',.08,.45));
+    box(g,0,5.0,z,20,.36,.5,sand);
+  }
   box(g,0,7.45,-21.3,80,.42,15,trim);
   box(g,0,8.0,-21.3,78,.7,14.7,M.roof);
   box(g,0,.28,frontage-1.4,82,.3,3.5,sand);
   for(let i=-4;i<=4;i++){
     const x=i*8.9;
-    box(g,x,2.8,frontage-.22,7.95,4.85,.12,recess);
+    if(i!==0)box(g,x,2.8,frontage-.22,7.95,4.85,.12,recess);
     const arch=new T.QuadraticBezierCurve3(new T.Vector3(x-3.55,1.15,frontage-.35),new T.Vector3(x,6.8,frontage-.35),new T.Vector3(x+3.55,1.15,frontage-.35));
-    tube(g,arch,.21,trim);
+    if(i!==0)tube(g,arch,.21,trim);
     if(i!==0){
       box(g,x,2.45,frontage-.37,5.8,3.5,.11,M.glass);
       for(const dx of [-1.85,0,1.85])box(g,x+dx,2.45,frontage-.48,.075,3.5,.08,trim);
       box(g,x,1.1,frontage-.5,6.1,.16,.16,sand);
-    }else{
-      box(g,x,2.3,frontage-.38,7.4,3.9,.12,M.glass);
-      for(const dx of [-2.9,-1.45,0,1.45,2.9])box(g,x+dx,2.3,frontage-.5,.08,3.9,.09,trim);
-      box(g,x,1.1,frontage-.53,7.4,.13,.13,trim);
     }
   }
   for(let i=-4;i<4;i++)box(g,(i+.5)*8.9,3.65,frontage-.48,.48,7.3,.75,sand);
@@ -68,15 +129,17 @@ function stationBuilding(g){
   for(let x=-36;x<=36;x+=9)box(g,x,7.2,frontage-.65,.38,.95,.32,trim);
   const rear=-14.03;
   box(g,0,6.95,rear+.16,77,.36,.5,trim);
-  box(g,0,.54,rear+.3,77,.38,.85,sand);
+  for(const x of [-21.7,21.7])box(g,x,.54,rear+.3,34.6,.38,.85,sand);
   for(let i=-4;i<=4;i++){
     const x=i*8.9;
-    box(g,x,3.25,rear+.32,7.2,4.8,.14,mat('#7899a0',.2,.42));
+    if(i!==0)box(g,x,3.25,rear+.32,7.2,4.8,.14,mat('#7899a0',.2,.42));
     const arc=new T.QuadraticBezierCurve3(new T.Vector3(x-3.45,1.05,rear+.52),new T.Vector3(x,7.65,rear+.52),new T.Vector3(x+3.45,1.05,rear+.52));
-    tube(g,arc,.22,trim);
-    for(const dx of [-2.25,-.75,.75,2.25])box(g,x+dx,2.85,rear+.48,.095,3.45,.13,trim);
-    box(g,x,1.12,rear+.52,6.9,.22,.2,sand);
-    if(i!==0)box(g,x,3.8,rear+.58,2.8,.72,.16,mat('#e0c6a8',0,.88));
+    if(i!==0)tube(g,arc,.22,trim);
+    if(i!==0){
+      for(const dx of [-2.25,-.75,.75,2.25])box(g,x+dx,2.85,rear+.48,.095,3.45,.13,trim);
+      box(g,x,1.12,rear+.52,6.9,.22,.2,sand);
+      box(g,x,3.8,rear+.58,2.8,.72,.16,mat('#e0c6a8',0,.88));
+    }
   }
   for(let i=-4;i<4;i++)box(g,(i+.5)*8.9,3.65,rear+.6,.52,7.3,.74,sand);
   box(g,0,7.85,rear+.45,22,1.15,.3,mat('#244868',.1,.75));
@@ -136,6 +199,8 @@ function environment(id){
   makeTrack(g,-8);makeTrack(g,8);
   box(g,0,.28,0,160,.55,11.3,M.platform);
   box(g,0,.28,-12.4,160,.55,3.9,M.platform);
+  platformSurface(g,160,11.3,0,5);
+  platformSurface(g,160,3.9,-12.4,2);
   for(const z of [-5.15,5.15,-10.5])box(g,0,.59,z,160,.08,.38,M.yellow);
   for(let x=-78;x<80;x+=2)for(const z of [-4.72,4.72,-10.9])box(g,x,.6,z,1.45,.035,.32,M.concreteDark);
   const ohe=new T.Group();g.add(ohe);makeOHE(ohe,-8);makeOHE(ohe,8);
@@ -162,7 +227,41 @@ for(let i=0;i<26;i++){const t=i/25;box(stair,0,.62+t*5.45,8.55-t*8.55,1.28,.045,
 box(g,0,6.15,-.6,2.5,.2,2.3,M.concrete);
 g.position.set(-35,.34,-4.25);return {group:g,dims,focus:new T.Vector3(-35,3.3,-3.5)};}
 
-function facadeModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);const w=8.13,h=3.827,z=1.4;for(const x of [-w/2,w/2]){box(g,x,2.45,z,.52,4.9,.75,M.concrete);box(g,x,2.4,z-.44,.20,3.85,.20,M.steelDark);box(g,x,.56,z-.44,.35,.25,.32,M.steel);for(const dx of [-.1,.1])for(const yy of [.5,.62])bolt(g,x+dx,yy,z-.62);}box(g,0,4.83,z,w+1,1.05,.8,M.concrete);box(g,0,4.25,z-.44,w,.20,.20,M.steelDark);const archY=[1.55,1.86,2.17];for(const base of archY){const curve=new T.QuadraticBezierCurve3(new T.Vector3(-w/2,base,z-.45),new T.Vector3(0,4.05-(base-1.55)*.2,z-.45),new T.Vector3(w/2,base,z-.45));tube(g,curve,.095,M.steel);for(let i=1;i<8;i++){const x=-w/2+i*w/8;const t=i/8;const y=2*(1-t)*t*(4.05-(base-1.55)*.2)+(1-t)*(1-t)*base+t*t*base;beam(g,[x,y,z-.45],[x,4.25,z-.45],.055,.055,M.steelLight);}}dimension(dims,[-w/2,5.35,z-.62],[w/2,5.35,z-.62],'8.130 m',[0,.45,0]);dimension(dims,[4.75,.45,z-.62],[4.75,4.277,z-.62],'3.827 m',[1.05,0,0]);label(dims,'6.275 / 6.395 / 7.240 / 8.130 m variants',[0,.85,z-.8],.58);g.position.set(0,.34,-30);return {group:g,dims,focus:new T.Vector3(0,3.0,-29)};}
+function facadeModel(){
+  const g=new T.Group(),dims=new T.Group();g.add(dims);
+  const w=8.13,z=1.4,front=z-.48;
+  const concrete=mat('#d5d1c6',0,.9);
+  for(const x of [-w/2,w/2]){
+    box(g,x,2.45,z,.58,4.9,.86,concrete);
+    box(g,x,2.43,front,.20,3.82,.20,M.steelLight);
+    box(g,x,.57,front-.06,.35,.25,.28,M.steel);
+    for(const dx of [-.1,.1])for(const y of [.50,.64])bolt(g,x+dx,y,front-.23,.024);
+  }
+  box(g,0,4.83,z,w+1,1.05,.9,concrete);
+  box(g,0,4.27,front,w,.20,.22,M.steelLight);
+  box(g,0,4.26,front-.14,w,.035,.035,M.steelDark);
+  const upper=curvedChannel(g,w,1.82,6.40,front-.06,.21);
+  const lower=curvedChannel(g,w,1.41,5.78,front-.08,.21);
+  // Suspended channel hangers and bolted gussets connect the header and both arcs.
+  for(let i=1;i<=7;i++){
+    const t=i/8,x=-w/2+t*w,yTop=upper(t),yLow=lower(t);
+    box(g,x,(4.16+yTop)/2,front-.18,.16,4.16-yTop,.18,M.steelLight);
+    box(g,x,(yTop+yLow)/2,front-.18,.16,yTop-yLow,.18,M.steelLight);
+    for(const y of [4.04,yTop+.08,yLow+.08]){
+      box(g,x,y,front-.30,.28,.25,.025,M.steel);
+      for(const dx of [-.085,.085])for(const dy of [-.065,.065])bolt(g,x+dx,y+dy,front-.33,.019);
+    }
+  }
+  for(const x of [-w/2,w/2]){
+    box(g,x,1.1,front-.27,.31,.68,.055,M.steel);
+    for(const y of [.85,1.05,1.25])for(const dx of [-.085,.085])bolt(g,x+dx,y,front-.32,.019);
+    box(g,x,4.16,front-.22,.34,.16,.30,M.steel);
+  }
+  dimension(dims,[-w/2,5.35,z-.62],[w/2,5.35,z-.62],'8.130 m',[0,.45,0]);
+  dimension(dims,[4.75,.45,z-.62],[4.75,4.277,z-.62],'3.827 m',[1.05,0,0]);
+  g.position.set(0,.34,-30);
+  return {group:g,dims,focus:new T.Vector3(0,3.0,-29)};
+}
 
 function copModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);box(g,0,-.42,0,3.6,.65,2.2,M.concreteDark);box(g,0,.15,0,1.35,1.15,.6,M.concrete);box(g,0,.78,0,1.15,.12,.55,M.steel);for(const x of [-.42,-.14,.14,.42])for(const z of [-.18,.18])bolt(g,x,.88,z);box(g,0,2.8,0,.42,4.0,.42,M.steelDark);const frames=9,length=22;for(let i=0;i<frames;i++){const x=-length/2+i*length/(frames-1);box(g,x,2.8,0,.18,4,.18,M.steelDark);for(const side of [-1,1]){beam(g,[x,4.65,side*.18],[x,4.05,side*5.7],.14,.18,M.steel);beam(g,[x,3.3,side*.18],[x,3.7,side*5.6],.12,.16,M.steel);beam(g,[x,3.05,side*.3],[x,3.55,side*4.8],.08,.10,M.steelLight);beam(g,[x,3.05,side*.3],[x,4.0,side*3.2],.08,.10,M.steelLight);}}for(const z of [-5.7,-4.5,-3.2,-1.8,1.8,3.2,4.5,5.7])box(g,0,4.02-Math.abs(z)*.08,z,length,.10,.10,M.steelLight);for(const side of [-1,1]){const roof=box(g,0,4.22,side*3.0,length,.08,5.9,M.roof);roof.rotation.x=-side*.10;box(g,0,3.95,side*5.88,length,.44,.22,M.roof);box(g,0,3.74,side*5.86,length,.08,.12,M.steelLight);for(let x=-10.5;x<=10.5;x+=1.05){const rib=box(g,x,4.30,side*3,.035,.05,5.7,M.steelLight);rib.rotation.x=-side*.10;}}for(const x of [-8.25,-2.75,2.75,8.25]){box(g,x,3.57,-2.4,1.1,.045,.16,mat('#eef5ec',.05,.35));box(g,x,3.57,2.4,1.1,.045,.16,mat('#eef5ec',.05,.35));}dimension(dims,[0,5.25,-6],[0,5.25,6],'12.000 m',[0,.45,0]);dimension(dims,[-1.8,-.9,-1.25],[1.8,-.9,-1.25],'3.600 m',[0,.45,0]);label(dims,'FOUNDATION 3.600 x 2.200 m',[0,-.15,1.6],.56);label(dims,'RCC PEDESTAL 1.350 x 0.600 m',[0,1.2,1.15],.52);g.position.set(25,.55,0);return {group:g,dims,focus:new T.Vector3(25,2.9,0)};}
 
