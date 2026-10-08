@@ -23,11 +23,18 @@ const fallbackArt={
     <g fill="#1b5e82" font-size="18" font-weight="700" font-family="sans-serif"><text x="350" y="32">3.200 m</text><text x="618" y="210">5.515 m</text></g>
   </svg>`,
   facade:`<svg viewBox="0 0 800 440" role="img" aria-label="Diagram of the curved steel facade frame spanning between concrete columns">
-    <path d="M0 0h800v440H0z" fill="#e7d0b8"/><path d="M0 350h800v90H0z" fill="#c9bdac"/><path d="M0 0h800v80H0z" fill="#c9998b"/>
-    <path d="M0 80h800v13H0z" fill="#f5e0c2"/><path d="M50 93h700v300H50z" fill="#d3a396"/>
-    <path d="M170 320h460v72H170z" fill="#34484c"/><path d="M90 42h80v350H90zm540 0h80v350h-80zM90 42h620v45H90z" fill="#e9d1ba"/>
-    <g stroke="#566f7e" fill="none" stroke-width="15"><path d="M165 320Q400 95 635 320"/><path d="M165 276Q400 67 635 276"/><path d="M165 238Q400 55 635 238"/></g>
-    <g stroke="#819ba8" stroke-width="8"><path d="M260 187v91m94-147v92m92-92v92m94-36v91"/></g>
+    <path d="M0 0h800v440H0z" fill="#d5d2c9"/><path d="M0 0h800v120H0z" fill="#e8e2d6"/>
+    <path d="M165 125h470v205H165z" fill="#c9c6ba"/><path d="M220 155h360v170H220z" fill="#d4d5ce"/>
+    <path d="M270 170h35v150h-35zm225 0h35v150h-35z" fill="#aaa99f"/>
+    <path d="M350 165h24v155h-24zm76 0h24v155h-24z" fill="#b7b5ab"/>
+    <path d="M165 330h470l105 110H60z" fill="#d1cdc3"/>
+    <g stroke="#eee9dd" stroke-width="2" fill="none"><path d="M165 330h470m-420 35h370m-325 35h280M280 330L190 440m150-110l-30 110m100-110l15 110m105-110l90 110"/></g>
+    <path d="M90 35h80v355H90zm540 0h80v355h-80zM90 35h620v90H90z" fill="#e2ded3"/>
+    <path d="M170 117h460v17H170z" fill="#718391" stroke="#394c57" stroke-width="3"/>
+    <g stroke="#8195a1" fill="none" stroke-width="16"><path d="M170 325Q400 90 630 325"/><path d="M170 284Q400 72 630 284"/></g>
+    <g stroke="#465c68" fill="none" stroke-width="3"><path d="M170 325Q400 90 630 325"/><path d="M170 284Q400 72 630 284"/></g>
+    <g stroke="#8c9ea8" stroke-width="12"><path d="M235 125v158m82-158v97m83-97v82m83-82v97m82-97v158"/></g>
+    <g fill="#445967"><circle cx="235" cy="204" r="4"/><circle cx="317" cy="180" r="4"/><circle cx="400" cy="170" r="4"/><circle cx="483" cy="180" r="4"/><circle cx="565" cy="204" r="4"/></g>
     <g stroke="#2678a1" stroke-width="2" fill="none"><path d="M165 20h470m-470-8v16m470-16v16M747 87v233m-8-233h16m-16 233h16"/></g>
     <g fill="#1b5e82" font-size="18" font-weight="700" font-family="sans-serif"><text x="350" y="18">8.130 m</text><text x="676" y="212">3.827 m</text></g>
   </svg>`,
