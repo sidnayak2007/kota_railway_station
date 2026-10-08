@@ -37,14 +37,24 @@
             <button class="active" data-view="overview" aria-pressed="true">Overview</button>
             <button data-view="platform" aria-pressed="false">Platform</button>
             <button data-view="section" aria-pressed="false">Section</button>
-            <button data-view="top" aria-pressed="false">Top</button>
+            <button data-view="top" aria-pressed="false">Aerial</button>
           </div>
           <button id="fullscreen" title="Expand viewer" aria-label="Expand viewer">⛶</button>
+        </div>
+        <div class="explore-toolbar" aria-label="Exploration and graphics settings">
+          <div class="camera-modes" role="group" aria-label="Camera mode"><button id="orbit-mode" class="active" aria-pressed="true">Orbit</button><button id="walk-mode" aria-pressed="false">Walk</button></div>
+          <label>AREA <select id="walk-zone" aria-label="Walkable area"><option value="island">Island platform</option><option value="main">Station platform</option><option value="concourse">Concourse</option><option value="forecourt">Forecourt</option></select></label>
+          <label>TIME <select id="time-of-day" aria-label="Time of day"><option value="day">Day</option><option value="dusk">Dusk</option><option value="night">Night</option></select></label>
+          <label>WEATHER <select id="weather" aria-label="Weather"><option value="clear">Clear</option><option value="haze">Haze</option><option value="rain">Rain</option></select></label>
+          <label>GRAPHICS <select id="graphics" aria-label="Graphics quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high" selected>High</option><option value="ultra">Ultra</option></select></label>
+          <button id="technical-mode" aria-pressed="false">Structure view</button><button id="announcements" aria-pressed="false">Announcements off</button>
         </div>
 
         <div id="viewport">
           <div id="loading"><span class="loader"></span><strong>Preparing Kota Station…</strong></div>
           <div class="scene-tag"><span id="scene-id">ESCALATOR STR</span><span>3D INTERPRETATION</span></div>
+          <div id="platform-readout" class="platform-readout" aria-live="polite">Island platform · Kota Junction</div>
+          <div id="walk-pad" class="walk-pad" hidden aria-label="Walk controls"><button data-move="forward" aria-label="Walk forward">↑</button><div><button data-move="left" aria-label="Walk left">←</button><button data-move="back" aria-label="Walk backward">↓</button><button data-move="right" aria-label="Walk right">→</button></div></div>
           <div class="view-actions"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset" aria-label="Reset view" title="Reset view">↺</button></div>
           <div class="viewer-help"><span class="desktop-help">Drag to orbit · Scroll to zoom</span><span class="touch-help">Drag to rotate · Pinch to zoom</span></div>
           <div id="fallback" hidden><div class="fallback-art" id="fallback-art"></div><div class="fallback-track" aria-hidden="true"><div class="fallback-rolling" id="fallback-rolling"><i></i><i></i><i></i><i></i></div></div><h2>3D view unavailable in this browser</h2><p>The structural preview and train mix remain available here. Use a browser with WebGL to rotate the detailed station model.</p></div>
@@ -62,12 +72,15 @@
           <label><input id="dimensions" type="checkbox"> Dimensions</label>
           <label><input id="overhead" type="checkbox" checked> OHE</label>
           <label><input id="landscape" type="checkbox" checked> Landscape</label>
+          <label><input id="show-facade" type="checkbox" checked> Façade frame</label>
+          <label><input id="show-escalator" type="checkbox" checked> Escalator frame</label>
+          <label><input id="show-cop" type="checkbox" checked> Platform canopy</label>
           <span>1 scene unit = 1 metre</span>
         </div>
       </section>
 
       <aside class="details">
-        <p class="eyebrow">DRAWING MEASUREMENTS</p>
+        <p class="eyebrow">DIMENSIONS VERIFIED FROM THE DRAWING</p>
         <h2 id="project-title">Escalator support frame</h2>
         <p id="project-description">A braced steel support frame at the island-platform access to the elevated concourse.</p><div class="placement"><span>INDICATIVE LOCATION</span><strong id="placement">Island platform · escalator access to the elevated concourse</strong></div>
         <dl id="dimension-list"></dl>
