@@ -1,4 +1,4 @@
-import * as T from './vendor/three.module.js';
+import * as T from 'three';
 
 const cache={};
 function mat(color,metalness=.1,roughness=.72,extra={}){const key=`${color}-${metalness}-${roughness}-${JSON.stringify(extra)}`;return cache[key]??=new T.MeshStandardMaterial({color,metalness,roughness,...extra});}
