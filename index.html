@@ -71,13 +71,25 @@
         <p id="project-description">A braced steel support frame on reinforced-concrete foundations, modelled across four structural levels.</p>
         <dl id="dimension-list"></dl>
         <div class="source-note" id="source-note">Conceptual 3D interpretation. The issued structural drawing governs fabrication and construction.</div>
+        <a class="download" id="pdf-link" href="assets/ESCALATOR%20STR%2021-09-2026%20Model.pdf" target="_blank" rel="noopener">Open original PDF <span>↗</span></a>
+        <a class="download secondary" id="pdf-download" href="assets/ESCALATOR%20STR%2021-09-2026%20Model.pdf" download>Download drawing <span>↓</span></a>
       </aside>
     </div>
 
 
+    <section class="reference" aria-label="Dimensioned 3D visualisation">
+      <div class="section-heading"><div><p class="eyebrow">DESIGN PREVIEW</p><h2>Dimensioned 3D visualisation</h2></div><button id="expand-board">Enlarge image ↗</button></div>
+      <button class="board-preview" id="board-button" aria-label="Enlarge the selected 3D visualisation"><img id="board-image" src="assets/Kota_Station_Escalator_3D_With_Measurements.png" alt="Dimensioned 3D visualisation of the escalator support frame" loading="lazy"></button>
+    </section>
+
     <footer><strong>Kota Rail 3D</strong><p>Independent visual study based on supplied drawings. Source PDFs govern dimensions and connections. Train, scenery and supporting context are illustrative.</p><span>Built by Siddharth Nayak</span></footer>
   </main>
 
+
+  <dialog id="image-dialog" aria-label="Enlarged 3D visualisation">
+    <div class="dialog-toolbar"><strong id="dialog-title">3D visualisation</strong><div><button id="image-minus" aria-label="Zoom image out">−</button><button id="image-plus" aria-label="Zoom image in">+</button><button id="close-dialog">Close ×</button></div></div>
+    <div id="image-scroller"><img id="large-image" src="assets/Kota_Station_Escalator_3D_With_Measurements.png" alt="Enlarged dimensioned 3D visualisation"></div>
+  </dialog>
 
   <script>window.addEventListener('load',()=>setTimeout(()=>{const l=document.getElementById('loading');if(l&&!l.hidden){l.hidden=true;document.getElementById('fallback').hidden=false;document.getElementById('train-status').textContent='3D startup interrupted';}},12000));</script>
   <script type="module" src="app.js"></script>
