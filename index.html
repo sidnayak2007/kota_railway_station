@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b2238">
+  <meta name="description" content="Interactive 3D structural viewer for Kota Station with dimensioned railway structures and a Vande Bharat train every 30 seconds.">
+  <title>Kota Rail 3D · Structural viewer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="./" aria-label="Kota Rail 3D home">
+      <span class="brand-mark">KR</span>
+      <span>KOTA RAIL <b>3D</b><small>STRUCTURAL VISUALISATION</small></span>
+    </a>
+    <span class="header-note">Kota Station <i></i> 3 engineering scenes</span>
+    <a class="repo-link" href="https://github.com/sidnayak2007/kota_railway_station" target="_blank" rel="noopener">GitHub ↗</a>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">THE DRAWINGS, BUILT IN 3D</p><h1>Explore Kota Station.</h1></div>
+      <p>Rotate, zoom and inspect every structure.<br>Dimensions remain visible inside the scene.</p>
+    </section>
+
+    <nav class="projects" aria-label="Select a structural model">
+      <button class="project selected" data-project="escalator" aria-pressed="true"><span class="project-number">01</span><span><small>ESCALATOR STR</small><strong>Escalator support frame</strong></span><span class="project-arrow">↗</span></button>
+      <button class="project" data-project="facade" aria-pressed="false"><span class="project-number">02</span><span><small>R1 FACADE</small><strong>Curved façade frame</strong></span><span class="project-arrow">↗</span></button>
+      <button class="project" data-project="cop" aria-pressed="false"><span class="project-number">03</span><span><small>12.00 M C.O.P.</small><strong>Platform canopy structure</strong></span><span class="project-arrow">↗</span></button>
+    </nav>
+
+    <div class="workspace">
+      <section class="viewer-card" aria-label="Interactive 3D viewer">
+        <div class="view-toolbar">
+          <div class="view-tabs" role="group" aria-label="Camera view">
+            <button class="active" data-view="overview" aria-pressed="true">Overview</button>
+            <button data-view="platform" aria-pressed="false">Platform</button>
+            <button data-view="section" aria-pressed="false">Section</button>
+            <button data-view="top" aria-pressed="false">Top</button>
+          </div>
+          <button id="fullscreen" title="Expand viewer" aria-label="Expand viewer">⛶</button>
+        </div>
+
+        <div id="viewport">
+          <div id="loading"><span class="loader"></span><strong>Preparing Kota Station…</strong></div>
+          <div class="scene-tag"><span id="scene-id">ESCALATOR STR</span><span>3D INTERPRETATION</span></div>
+          <div class="view-actions"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset" aria-label="Reset view" title="Reset view">↺</button></div>
+          <div class="viewer-help"><span class="desktop-help">Drag to orbit · Scroll to zoom</span><span class="touch-help">Drag to rotate · Pinch to zoom</span></div>
+          <div id="fallback" hidden><h2>3D is unavailable on this device.</h2><p>The dimensioned visualisations and original drawings remain available below.</p></div>
+        </div>
+
+        <div class="train-bar">
+          <div class="train-icon">VB</div>
+          <div class="train-copy"><strong>Vande Bharat</strong><span id="train-status" role="status">Entering the station</span></div>
+          <div class="train-progress"><div id="progress"></div></div>
+          <button id="run-train">Run now</button><button id="pause" aria-pressed="false">Pause</button>
+        </div>
+
+        <div class="scene-options">
+          <label><input id="dimensions" type="checkbox" checked> Dimensions</label>
+          <label><input id="overhead" type="checkbox" checked> OHE</label>
+          <label><input id="landscape" type="checkbox" checked> Landscape</label>
+          <span>1 scene unit = 1 metre</span>
+        </div>
+      </section>
+
+      <aside class="details">
+        <p class="eyebrow">DRAWING MEASUREMENTS</p>
+        <h2 id="project-title">Escalator support frame</h2>
+        <p id="project-description">A braced steel support frame on reinforced-concrete foundations, modelled across four structural levels.</p>
+        <dl id="dimension-list"></dl>
+        <div class="source-note" id="source-note">Conceptual 3D interpretation. The issued structural drawing governs fabrication and construction.</div>
+        <a class="download" id="pdf-link" href="assets/escalator-structure.pdf" target="_blank" rel="noopener">Open original PDF <span>↗</span></a>
+        <a class="download secondary" id="pdf-download" href="assets/escalator-structure.pdf" download>Download drawing <span>↓</span></a>
+      </aside>
+    </div>
+
+    <section class="reference">
+      <div class="section-heading"><div><p class="eyebrow">DESIGN PREVIEW</p><h2>Dimensioned 3D visualisation</h2></div><button id="expand-board">Enlarge image ↗</button></div>
+      <button class="board-preview" id="board-button" aria-label="Enlarge the selected 3D visualisation"><img id="board-image" src="assets/escalator-3d.png" alt="Dimensioned 3D visualisation of the escalator support structure" loading="lazy"></button>
+    </section>
+
+    <footer><strong>Kota Rail 3D</strong><p>Independent visual study based on supplied drawings. Source PDFs govern dimensions and connections. Train, scenery and supporting context are illustrative.</p><span>Built by Siddharth Nayak</span></footer>
+  </main>
+
+  <dialog id="image-dialog" aria-label="Enlarged 3D visualisation">
+    <div class="dialog-toolbar"><strong id="dialog-title">3D visualisation</strong><div><button id="image-minus" aria-label="Zoom image out">−</button><button id="image-plus" aria-label="Zoom image in">+</button><button id="close-dialog">Close ×</button></div></div>
+    <div id="image-scroller"><img id="large-image" src="assets/escalator-3d.png" alt="Enlarged dimensioned 3D visualisation"></div>
+  </dialog>
+
+  <script>window.addEventListener('load',()=>setTimeout(()=>{const l=document.getElementById('loading');if(l&&!l.hidden){l.hidden=true;document.getElementById('fallback').hidden=false;document.getElementById('train-status').textContent='3D startup interrupted';}},12000));</script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
