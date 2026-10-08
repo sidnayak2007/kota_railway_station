@@ -12,9 +12,9 @@ const M={
 };
 
 export const data={
-  escalator:{label:'ESCALATOR STR',title:'Escalator support frame',description:'A four-column braced steel support frame on reinforced-concrete foundations, modelled across four structural levels.',pdf:"ESCALATOR STR 21-09-2026 Model.pdf",image:"Kota_Station_Escalator_3D_With_Measurements.png",alt:"Dimensioned 3D visualisation of the escalator support frame",rows:[['Grid 1-2','3.200 m'],['Grid A-B','1.000 m'],['Level 1-4','5.515 m'],['Level intervals','0.525 / 1.720 / 3.270 m'],['Pedestal','0.800 × 0.600 m'],['Footing','1.200 × 2.000 m'],['Main columns','ISHB 200'],['Bracing','ISA 75×75×6']],note:'Foundation datum is shown at -2.000 m. The model is a visual interpretation; issued structural details govern connections and reinforcement.'},
-  facade:{label:'R1 FACADE',title:'Curved façade frame',description:'A three-rib curved steel façade frame fixed between existing RCC columns and suspended from the slab-level channel.',pdf:"R1_FACADE STR_21-09-2026.pdf",image:"Kota_Station_Facade_3D_With_Measurements.png",alt:"Dimensioned 3D visualisation of the curved façade frame",rows:[['Shown bay','8.130 m'],['Frame height','3.827 m'],['Drawing variants','6.275 / 6.395 / 7.240 / 8.130 m'],['Main member','ISMC 200'],['Base plate','0.350 × 0.250 × 0.016 m'],['Top plate','0.250 × 0.180 × 0.012 m'],['Anchors','4-M20 Grade 8.8']],note:'The 8.130 m span variant is modelled. The other three bay widths remain listed for comparison with the issued façade drawing.'},
-  cop:{label:'12.00 M C.O.P.',title:'Platform canopy structure',description:'A symmetrical 12 m cover-over-platform canopy with a central OHE-compatible support, roof steelwork and foundation cutaway.',pdf:"R1_Final_C.O.P. SECTION FOR 12.00M SPAN 08-06-2026-Model.pdf",image:"Kota_Station_COP_12m_3D_With_Measurements.png",alt:"Dimensioned 3D visualisation of the platform canopy",rows:[['Overall span','12.000 m'],['Foundation','3.600 × 2.200 m'],['RCC pedestal','1.350 × 0.600 m'],['Base plate','1.150 × 0.550 × 0.036 m'],['Anchor bolts','12-M30 Grade 8.8'],['Bolt length','1.300 m'],['Model variant','With OHE']],note:'Roof members and foundation are arranged from the supplied section. The rendered station context and longitudinal canopy length are illustrative.'}
+  escalator:{label:'ESCALATOR STR',title:'Escalator support frame',description:'Four-column braced support frame at the island-platform access to the elevated concourse. The escalator run and bridge show its passenger-route context.',pdf:"ESCALATOR STR 21-09-2026 Model.pdf",image:"Kota_Station_Escalator_3D_With_Measurements.png",alt:"Dimensioned 3D visualisation of the escalator support frame",rows:[['Grid 1-2','3.200 m'],['Grid A-B','1.000 m'],['Level 1-4','5.515 m'],['Level intervals','0.525 / 1.720 / 3.270 m'],['Pedestal','0.800 × 0.600 m'],['Footing','1.200 × 2.000 m'],['Main columns','ISHB 200'],['Bracing','ISA 75×75×6']],placement:'Island platform · escalator access to the elevated concourse',note:'The structural sheet gives frame dimensions, not a station grid location. Bridge and escalator placement are indicative; foundation datum is -2.000 m.'},
+  facade:{label:'R1 FACADE',title:'Curved façade frame',description:'The 8.130 m curved steel frame sits within an existing RCC bay on the station-building frontage, facing the forecourt.',pdf:"R1_FACADE STR_21-09-2026.pdf",image:"Kota_Station_Facade_3D_With_Measurements.png",alt:"Dimensioned 3D visualisation of the curved façade frame",rows:[['Shown bay','8.130 m'],['Frame height','3.827 m'],['Drawing variants','6.275 / 6.395 / 7.240 / 8.130 m'],['Main member','ISMC 200'],['Base plate','0.350 × 0.250 × 0.016 m'],['Top plate','0.250 × 0.180 × 0.012 m'],['Anchors','4-M20 Grade 8.8']],placement:'Main station building · RCC bay facing the forecourt',note:'The drawing anchors this frame to existing RCC columns and slab. The exact frontage bay is not identified, so the centre bay is illustrative.'},
+  cop:{label:'12.00 M C.O.P.',title:'Platform canopy structure',description:'The 12 m C.O.P. spans the island platform between running lines, with its central support and OHE-compatible clearance.',pdf:"R1_Final_C.O.P. SECTION FOR 12.00M SPAN 08-06-2026-Model.pdf",image:"Kota_Station_COP_12m_3D_With_Measurements.png",alt:"Dimensioned 3D visualisation of the platform canopy",rows:[['Overall span','12.000 m'],['Foundation','3.600 × 2.200 m'],['RCC pedestal','1.350 × 0.600 m'],['Base plate','1.150 × 0.550 × 0.036 m'],['Anchor bolts','12-M30 Grade 8.8'],['Bolt length','1.300 m'],['Model variant','With OHE']],placement:'Island platform · cover over platform',note:'The supplied section governs the 12 m transverse span. Longitudinal roof length and station placement are illustrative.'}
 };
 
 export function box(g,x,y,z,w,h,d,m=M.steel){const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o;}
@@ -31,11 +31,87 @@ function makeTrack(g,centreZ,length=180){box(g,0,-.14,centreZ,length,.25,3.6,M.b
 function makeOHE(g,centreZ,length=180){const q=new T.Group();g.add(q);for(let x=-length/2+7;x<length/2;x+=18){box(q,x,3.3,centreZ+3.35,.18,6.8,.22,M.steelDark);beam(q,[x,6.6,centreZ+3.35],[x,6.2,centreZ-1.25],.075,.075,M.steelDark);beam(q,[x,5.2,centreZ+3.35],[x,6.15,centreZ+.4],.05,.05,M.steelDark);for(let k=0;k<4;k++)cylinder(q,x,6.2+k*.09,centreZ-.35,.08,.05,mat('#725848',.12,.75),10);}for(const h of [5.85,6.28])beam(q,[-length/2,h,centreZ],[length/2,h,centreZ],.025,.025,M.steelDark);for(let x=-length/2;x<=length/2;x+=4)beam(q,[x,5.85,centreZ],[x,6.28,centreZ],.014,.014,M.steelDark);return q;}
 
 function tree(g,x,z,s=1){const q=new T.Group();q.position.set(x,-.2,z);g.add(q);cylinder(q,0,1.1*s,0,.16*s,2.2*s,mat('#6f5138',0,1),8);for(const p of [[0,2.4,0],[.55,2.15,.1],[-.5,2.2,.18],[.2,2.0,-.5]]){const crown=new T.Mesh(new T.IcosahedronGeometry(.85*s,1),mat('#4c7e4d',0,1));crown.position.set(p[0]*s,p[1]*s,p[2]*s);crown.castShadow=true;q.add(crown);}}
-function environment(){const g=new T.Group(),landscape=new T.Group();g.add(landscape);box(landscape,0,-.8,0,200,1.1,90,M.ground);makeTrack(g,-8);makeTrack(g,8);box(g,0,.28,0,160,.55,11.3,M.platform);box(g,0,.59,-5.15,160,.08,.38,M.yellow);box(g,0,.59,5.15,160,.08,.38,M.yellow);for(let x=-78;x<80;x+=2){box(g,x,.6,-4.72,1.45,.035,.32,M.concreteDark);box(g,x,.6,4.72,1.45,.035,.32,M.concreteDark);}const ohe=new T.Group();g.add(ohe);makeOHE(ohe,-8);makeOHE(ohe,8);for(let x=-78;x<=78;x+=13){tree(landscape,x,-18,1+(Math.abs(x)%4)*.08);tree(landscape,x+5,20,.9+(Math.abs(x)%5)*.06);}box(landscape,0,2.1,28,120,4.2,5.5,mat('#dedbd2',0,.96));for(let x=-53;x<=53;x+=7){box(landscape,x,2.2,25.2,3.8,1.6,.12,M.glass);box(landscape,x,4.38,26.7,6.2,.20,3.8,M.roof);}for(let x=-80;x<=80;x+=20){box(landscape,x,.2,-24,8,.5,5,M.soil);box(landscape,x,.2,24,8,.5,5,M.soil);}return {group:g,ohe,landscape};}
+function stationBuilding(g){
+  const rose=mat('#cf9e92',0,.94),sand=mat('#eed2b8',0,.94),trim=mat('#f3dfc4',0,.9),recess=mat('#414a49',0,.9);
+  const frontage=-28.5;
+  box(g,0,3.65,-21.3,78,7.3,14.4,rose);
+  box(g,0,7.45,-21.3,80,.42,15,trim);
+  box(g,0,8.0,-21.3,78,.7,14.7,M.roof);
+  box(g,0,.28,frontage-1.4,82,.3,3.5,sand);
+  for(let i=-4;i<=4;i++){
+    const x=i*8.9;
+    box(g,x,2.8,frontage-.22,7.95,4.85,.12,recess);
+    const arch=new T.QuadraticBezierCurve3(new T.Vector3(x-3.55,1.15,frontage-.35),new T.Vector3(x,6.8,frontage-.35),new T.Vector3(x+3.55,1.15,frontage-.35));
+    tube(g,arch,.21,trim);
+    if(i!==0){
+      box(g,x,2.45,frontage-.37,5.8,3.5,.11,M.glass);
+      for(const dx of [-1.85,0,1.85])box(g,x+dx,2.45,frontage-.48,.075,3.5,.08,trim);
+      box(g,x,1.1,frontage-.5,6.1,.16,.16,sand);
+    }
+  }
+  for(let i=-4;i<4;i++)box(g,(i+.5)*8.9,3.65,frontage-.48,.48,7.3,.75,sand);
+  box(g,0,6.95,frontage-.48,76,.18,.6,sand);
+  for(const x of [-31,31]){
+    box(g,x,9.5,frontage+1,5.4,3.9,5.1,rose);
+    box(g,x,11.7,frontage+1,6,.45,5.6,trim);
+    const clock=new T.Mesh(new T.CylinderGeometry(1.05,1.05,.08,36),mat('#fff1d6',0,.45));
+    clock.rotation.x=Math.PI/2;clock.position.set(x,9.55,frontage-1.62);g.add(clock);
+    beam(g,[x,9.55,frontage-1.7],[x+.02,10.2,frontage-1.7],.055,.055,M.steelDark);
+    beam(g,[x,9.55,frontage-1.7],[x+.42,9.28,frontage-1.7],.05,.05,M.steelDark);
+  }
+  box(g,0,8.55,frontage-.55,20,1.15,.22,mat('#244868',.1,.75));
+  label(g,'कोटा जं.   KOTA JN.',[0,8.55,frontage-1.0],.54);
+  for(let x=-36;x<=36;x+=9)box(g,x,7.2,frontage-.65,.38,.95,.32,trim);
+  box(g,0,.06,-39,100,.13,15,mat('#7b8484',0,1));
+  box(g,0,.15,-31.6,100,.12,2.7,sand);
+  for(const x of [-25,-17,17,25]){box(g,x,.27,-36,4,.22,2.1,M.soil);tree(g,x,-36,1.25);}
+}
+function stationBridge(g){
+  const bridge=new T.Group();g.add(bridge);
+  box(bridge,0,6.56,-9.35,6.9,.28,12,M.concrete);
+  box(bridge,0,6.73,-9.35,6.45,.08,11.8,sandstone());
+  for(const x of [-3.45,3.45]){
+    box(bridge,x,7.7,-9.35,.08,1.85,11.95,M.glass);
+    box(bridge,x,8.65,-9.35,.18,.12,12,M.steelDark);
+    for(let z=-14.7;z<=-4;z+=2)box(bridge,x,7.7,z,.12,2.1,.13,M.steelLight);
+  }
+  for(const z of [-14.9,-3.8]){for(const x of [-3.2,3.2])box(bridge,x,3.25,z,.26,6.5,.28,M.concrete);}
+  box(bridge,0,8.95,-9.35,7.4,.18,12,M.roof);
+  box(bridge,0,6.55,-16,7.3,.3,2.8,M.concrete);
+}
+function sandstone(){return mat('#c8b9a2',0,.96);}
+function environment(){
+  const g=new T.Group(),landscape=new T.Group();g.add(landscape);
+  box(landscape,0,-.8,-5,200,1.1,100,M.ground);
+  makeTrack(g,-8);makeTrack(g,8);
+  box(g,0,.28,0,160,.55,11.3,M.platform);
+  box(g,0,.28,-12.4,160,.55,3.9,M.platform);
+  for(const z of [-5.15,5.15,-10.5])box(g,0,.59,z,160,.08,.38,M.yellow);
+  for(let x=-78;x<80;x+=2)for(const z of [-4.72,4.72,-10.9])box(g,x,.6,z,1.45,.035,.32,M.concreteDark);
+  const ohe=new T.Group();g.add(ohe);makeOHE(ohe,-8);makeOHE(ohe,8);
+  stationBuilding(landscape);
+  stationBridge(landscape);
+  for(const x of [-58,-43,43,58]){tree(landscape,x,-36,1.1);tree(landscape,x,22,1.1);}
+  for(const x of [-28,28]){
+    for(const z of [-.3,.3])box(landscape,x,2.65,z,.25,4.2,.25,M.steelDark);
+    box(landscape,x,4.7,0,.4,.25,10.7,M.steel);
+    box(landscape,x,4.8,0,12,.12,11,M.roof);
+  }
+  return {group:g,ohe,landscape};
+}
+function escalatorModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);const xs=[-1.6,1.6],zs=[-.5,.5],levels=[.6,1.125,2.845,6.115];for(const x of xs)for(const z of zs){box(g,x,-.15,z,1.2,.45,2,M.concrete);box(g,x,.25,z,.8,.35,.6,M.concreteDark);box(g,x,3.35,z,.20,5.5,.20,M.steelDark);for(const dx of [-.24,.24])for(const dz of [-.14,.14])bolt(g,x+dx,.47,z+dz);}for(const y of [levels[1],levels[2],levels[3]])for(const z of zs)box(g,0,y,z,3.4,.20,.18,M.steel);for(const y of [levels[2],levels[3]])for(const x of xs)box(g,x,y,0,.18,.18,1.15,M.steel);for(const z of zs){beam(g,[-1.5,levels[1],z],[1.5,levels[2],z],.10,.10,M.steelLight);beam(g,[1.5,levels[1],z],[-1.5,levels[2],z],.10,.10,M.steelLight);beam(g,[-1.5,levels[2],z],[1.5,levels[3],z],.10,.10,M.steelLight);beam(g,[1.5,levels[2],z],[-1.5,levels[3],z],.10,.10,M.steelLight);}for(const x of xs){beam(g,[x,levels[1],-.48],[x,levels[2],.48],.09,.09,M.steelLight);beam(g,[x,levels[1],.48],[x,levels[2],-.48],.09,.09,M.steelLight);beam(g,[x,levels[2],-.48],[x,levels[3],.48],.09,.09,M.steelLight);beam(g,[x,levels[2],.48],[x,levels[3],-.48],.09,.09,M.steelLight);}dimension(dims,[-1.6,6.55,-.72],[1.6,6.55,-.72],'3.200 m',[0,.42,0]);dimension(dims,[2.15,.6,-.65],[2.15,6.115,-.65],'5.515 m',[1.05,0,0]);dimension(dims,[-2.05,.72,-.5],[-2.05,.72,.5],'1.000 m',[-.85,.2,0]);label(dims,'ISHB 200 + ISA 75x75x6',[0,4.35,.8],.58);// The frame carries the upper landing where the island platform joins the concourse bridge.
+const stair=new T.Group();g.add(stair);
+const a=[0,.6,8.55],b=[0,6.07,0];
+beam(stair,a,b,1.32,.2,M.steelDark);
+for(const side of [-1,1]){
+  beam(stair,[side*.75,.8,8.55],[side*.75,6.28,0],.09,.08,M.steelLight);
+  beam(stair,[side*.76,1.7,8.55],[side*.76,7.1,0],.08,.07,M.steelDark);
+}
+for(let i=0;i<26;i++){const t=i/25;box(stair,0,.62+t*5.45,8.55-t*8.55,1.28,.045,.33,M.concreteDark);}
+box(g,0,6.15,-.6,2.5,.2,2.3,M.concrete);
+g.position.set(0,.34,-4.25);return {group:g,dims,focus:new T.Vector3(0,3.3,-3.5)};}
 
-function escalatorModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);const xs=[-1.6,1.6],zs=[-.5,.5],levels=[.6,1.125,2.845,6.115];for(const x of xs)for(const z of zs){box(g,x,-.15,z,1.2,.45,2,M.concrete);box(g,x,.25,z,.8,.35,.6,M.concreteDark);box(g,x,3.35,z,.20,5.5,.20,M.steelDark);for(const dx of [-.24,.24])for(const dz of [-.14,.14])bolt(g,x+dx,.47,z+dz);}for(const y of [levels[1],levels[2],levels[3]])for(const z of zs)box(g,0,y,z,3.4,.20,.18,M.steel);for(const y of [levels[2],levels[3]])for(const x of xs)box(g,x,y,0,.18,.18,1.15,M.steel);for(const z of zs){beam(g,[-1.5,levels[1],z],[1.5,levels[2],z],.10,.10,M.steelLight);beam(g,[1.5,levels[1],z],[-1.5,levels[2],z],.10,.10,M.steelLight);beam(g,[-1.5,levels[2],z],[1.5,levels[3],z],.10,.10,M.steelLight);beam(g,[1.5,levels[2],z],[-1.5,levels[3],z],.10,.10,M.steelLight);}for(const x of xs){beam(g,[x,levels[1],-.48],[x,levels[2],.48],.09,.09,M.steelLight);beam(g,[x,levels[1],.48],[x,levels[2],-.48],.09,.09,M.steelLight);beam(g,[x,levels[2],-.48],[x,levels[3],.48],.09,.09,M.steelLight);beam(g,[x,levels[2],.48],[x,levels[3],-.48],.09,.09,M.steelLight);}dimension(dims,[-1.6,6.55,-.72],[1.6,6.55,-.72],'3.200 m',[0,.42,0]);dimension(dims,[2.15,.6,-.65],[2.15,6.115,-.65],'5.515 m',[1.05,0,0]);dimension(dims,[-2.05,.72,-.5],[-2.05,.72,.5],'1.000 m',[-.85,.2,0]);label(dims,'ISHB 200 + ISA 75x75x6',[0,4.35,.8],.58);g.position.set(0,.34,1.2);return {group:g,dims,focus:new T.Vector3(0,3.2,1.2)};}
-
-function facadeModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);const w=8.13,h=3.827,z=1.4;for(const x of [-w/2,w/2]){box(g,x,2.45,z,.52,4.9,.75,M.concrete);box(g,x,2.4,z-.44,.20,3.85,.20,M.steelDark);box(g,x,.56,z-.44,.35,.25,.32,M.steel);for(const dx of [-.1,.1])for(const yy of [.5,.62])bolt(g,x+dx,yy,z-.62);}box(g,0,4.83,z,w+1,1.05,.8,M.concrete);box(g,0,4.25,z-.44,w,.20,.20,M.steelDark);const archY=[1.55,1.86,2.17];for(const base of archY){const curve=new T.QuadraticBezierCurve3(new T.Vector3(-w/2,base,z-.45),new T.Vector3(0,4.05-(base-1.55)*.2,z-.45),new T.Vector3(w/2,base,z-.45));tube(g,curve,.095,M.steel);for(let i=1;i<8;i++){const x=-w/2+i*w/8;const t=i/8;const y=2*(1-t)*t*(4.05-(base-1.55)*.2)+(1-t)*(1-t)*base+t*t*base;beam(g,[x,y,z-.45],[x,4.25,z-.45],.055,.055,M.steelLight);}}dimension(dims,[-w/2,5.35,z-.62],[w/2,5.35,z-.62],'8.130 m',[0,.45,0]);dimension(dims,[4.75,.45,z-.62],[4.75,4.277,z-.62],'3.827 m',[1.05,0,0]);label(dims,'6.275 / 6.395 / 7.240 / 8.130 m variants',[0,.85,z-.8],.58);g.position.set(0,.34,1.25);return {group:g,dims,focus:new T.Vector3(0,2.8,1.25)};}
+function facadeModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);const w=8.13,h=3.827,z=1.4;for(const x of [-w/2,w/2]){box(g,x,2.45,z,.52,4.9,.75,M.concrete);box(g,x,2.4,z-.44,.20,3.85,.20,M.steelDark);box(g,x,.56,z-.44,.35,.25,.32,M.steel);for(const dx of [-.1,.1])for(const yy of [.5,.62])bolt(g,x+dx,yy,z-.62);}box(g,0,4.83,z,w+1,1.05,.8,M.concrete);box(g,0,4.25,z-.44,w,.20,.20,M.steelDark);const archY=[1.55,1.86,2.17];for(const base of archY){const curve=new T.QuadraticBezierCurve3(new T.Vector3(-w/2,base,z-.45),new T.Vector3(0,4.05-(base-1.55)*.2,z-.45),new T.Vector3(w/2,base,z-.45));tube(g,curve,.095,M.steel);for(let i=1;i<8;i++){const x=-w/2+i*w/8;const t=i/8;const y=2*(1-t)*t*(4.05-(base-1.55)*.2)+(1-t)*(1-t)*base+t*t*base;beam(g,[x,y,z-.45],[x,4.25,z-.45],.055,.055,M.steelLight);}}dimension(dims,[-w/2,5.35,z-.62],[w/2,5.35,z-.62],'8.130 m',[0,.45,0]);dimension(dims,[4.75,.45,z-.62],[4.75,4.277,z-.62],'3.827 m',[1.05,0,0]);label(dims,'6.275 / 6.395 / 7.240 / 8.130 m variants',[0,.85,z-.8],.58);g.position.set(0,.34,-30);return {group:g,dims,focus:new T.Vector3(0,3.0,-29)};}
 
 function copModel(){const g=new T.Group(),dims=new T.Group();g.add(dims);box(g,0,-.42,0,3.6,.65,2.2,M.concreteDark);box(g,0,.15,0,1.35,1.15,.6,M.concrete);box(g,0,.78,0,1.15,.12,.55,M.steel);for(const x of [-.42,-.14,.14,.42])for(const z of [-.18,.18])bolt(g,x,.88,z);box(g,0,2.8,0,.42,4.0,.42,M.steelDark);const frames=9,length=22;for(let i=0;i<frames;i++){const x=-length/2+i*length/(frames-1);box(g,x,2.8,0,.18,4,.18,M.steelDark);for(const side of [-1,1]){beam(g,[x,4.65,side*.18],[x,4.05,side*5.7],.14,.18,M.steel);beam(g,[x,3.3,side*.18],[x,3.7,side*5.6],.12,.16,M.steel);beam(g,[x,3.05,side*.3],[x,3.55,side*4.8],.08,.10,M.steelLight);beam(g,[x,3.05,side*.3],[x,4.0,side*3.2],.08,.10,M.steelLight);}}for(const z of [-5.7,-4.5,-3.2,-1.8,1.8,3.2,4.5,5.7])box(g,0,4.02-Math.abs(z)*.08,z,length,.10,.10,M.steelLight);for(const side of [-1,1]){const roof=box(g,0,4.22,side*3.0,length,.08,5.9,M.roof);roof.rotation.x=-side*.10;box(g,0,3.95,side*5.88,length,.44,.22,M.roof);}dimension(dims,[0,5.25,-6],[0,5.25,6],'12.000 m',[0,.45,0]);dimension(dims,[-1.8,-.9,-1.25],[1.8,-.9,-1.25],'3.600 m',[0,.45,0]);label(dims,'FOUNDATION 3.600 x 2.200 m',[0,-.15,1.6],.56);label(dims,'RCC PEDESTAL 1.350 x 0.600 m',[0,1.2,1.15],.52);g.position.set(0,.55,0);return {group:g,dims,focus:new T.Vector3(0,2.9,0)};}
 
