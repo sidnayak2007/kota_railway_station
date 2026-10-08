@@ -1,5 +1,6 @@
 import * as T from 'three';
 import {OrbitControls} from './vendor/OrbitControls.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {data,makeModel} from './models.js';
 import {trainTypes,makeTrain} from './trains.js';
 
@@ -165,7 +166,9 @@ info();
 try{
   if(coarse)$('#graphics').value='medium';
   renderer=new T.WebGLRenderer({antialias:!coarse,alpha:false,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,coarse?1.15:1.65));renderer.setClearColor('#bfd8e8');renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;renderer.shadowMap.enabled=!coarse;renderer.shadowMap.type=T.PCFSoftShadowMap;viewport.prepend(renderer.domElement);renderer.domElement.setAttribute('aria-label','Interactive Kota Station structural model. Drag to rotate and pinch or scroll to zoom.');renderer.domElement.setAttribute('role','img');
-  scene=new T.Scene();scene.background=new T.Color('#bfd8e8');scene.fog=new T.Fog('#c9d9d9',85,205);hemisphere=new T.HemisphereLight('#e9f3ff','#8d846e',1.15);scene.add(hemisphere);sun=new T.DirectionalLight('#fff1d9',2.25);sun.castShadow=!coarse;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-38;sun.shadow.camera.right=38;sun.shadow.camera.top=34;sun.shadow.camera.bottom=-34;sun.shadow.normalBias=.025;sun.shadow.bias=-.00015;sun.shadow.radius=2;scene.add(sun,sun.target);bounce=new T.DirectionalLight('#d9e9fa',.48);bounce.position.set(18,14,22);scene.add(bounce);ambient=new T.AmbientLight('#ffffff',.1);scene.add(ambient);
+  scene=new T.Scene();scene.background=new T.Color('#bfd8e8');scene.fog=new T.Fog('#c9d9d9',85,205);
+  const pmrem=new T.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(new RoomEnvironment()).texture;scene.environmentIntensity=.42;pmrem.dispose();
+  hemisphere=new T.HemisphereLight('#e9f3ff','#8d846e',1.15);scene.add(hemisphere);sun=new T.DirectionalLight('#fff1d9',2.25);sun.castShadow=!coarse;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-38;sun.shadow.camera.right=38;sun.shadow.camera.top=34;sun.shadow.camera.bottom=-34;sun.shadow.normalBias=.025;sun.shadow.bias=-.00015;sun.shadow.radius=2;scene.add(sun,sun.target);bounce=new T.DirectionalLight('#d9e9fa',.48);bounce.position.set(18,14,22);scene.add(bounce);ambient=new T.AmbientLight('#ffffff',.1);scene.add(ambient);
   nightLights=new T.Group();for(const [x,y,z,power] of [[-35,5,0,24],[-15,5,0,18],[10,5,0,18],[30,5,0,24],[0,4.8,-23,26],[0,5,-17,20]]){const light=new T.PointLight('#ffe4ae',power,17,2);light.position.set(x,y,z);nightLights.add(light);}scene.add(nightLights);
   const drops=new Float32Array(900);let seed=2017;for(let i=0;i<drops.length;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;drops[i]=(seed/4294967296-.5)*32;if(i%3===1)drops[i]=(seed/4294967296)*14;}
   rain=new T.Points(new T.BufferGeometry().setAttribute('position',new T.BufferAttribute(drops,3)),new T.PointsMaterial({color:'#d6e9f5',size:.055,transparent:true,opacity:.65,depthWrite:false}));scene.add(rain);
