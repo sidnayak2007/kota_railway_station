@@ -23,3 +23,5 @@ npm run build
 ```
 
 The procedural models are visual interpretations. The supplied PDFs govern construction dimensions, reinforcement and connections.
+
+The original drawing PDFs and static preview images are not included in this repository. Their dimensions are represented in the model and measurement panel.
